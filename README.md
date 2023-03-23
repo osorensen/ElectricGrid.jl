@@ -2,6 +2,8 @@
   
 
   ![Dare Logo](public/logo.png)
+  
+  [![coveralls](https://coveralls.io/repos/github/JuliaCI/Coverage.jl/badge.svg?branch=feature_15_first_rl_experiments)](https://coveralls.io/github/JuliaCI/Coverage.jl?branch=feature_15_first_rl_experiments)
 
 # Instantiating and managing the "dare" julia environment
 
