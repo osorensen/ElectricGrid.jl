@@ -35,7 +35,7 @@ function Benchmark(num_nodes)
     return b
 end
 
-function CollectBenchmarkData(max_num_nodes)
+function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
     """
     Collects benchmark data for a given number of nodes
     """
@@ -43,7 +43,8 @@ function CollectBenchmarkData(max_num_nodes)
     @info "Dummy run..."
     Benchmark(2)
 
-    for i in 2:max_num_nodes
+    for i in 2:delta_num_nodes:max_num_nodes
+
         @info "Running benchmark for $i nodes..."
         b = Benchmark(i)
         push!(benchmark_data, b)
@@ -52,9 +53,11 @@ function CollectBenchmarkData(max_num_nodes)
 end
 # N = NodeConstructor(num_sources = 2, num_loads = 2)
 
-@save "benchmark_data_2_33.jld2" benchmark_data
-
 CollectBenchmarkData(100)
+
+@save "benchmark_data_2_$max_num_nodes.jld2" benchmark_data
+
+
 
 times = [(b.times * 1e-9) for b in benchmark_data]
 nodes = collect(2:33)
@@ -69,7 +72,7 @@ StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times],
 #     label = "Benchmark", legend = :topright,
 #     errorstyle=:plume, linewidth = 2, color = :red, alpha = 0.5,)
 
-savefig("benchmark_2_33.png")
+savefig("benchmark_2_$max_num_nodes.png")
 
 
 
