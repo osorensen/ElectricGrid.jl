@@ -49,7 +49,7 @@ it can be generated automatically. `S2S_p` is the probability that a source is c
 another source and `S2L_p` is the probability that a source is connected to a load.
 """
 function NodeConstructor(; num_sources, num_loads, CM=nothing, parameters=nothing,
-    S2S_p=0, S2L_p=1, L2L_p=0, ts=10000, invoke_pfe=true, verbosity=0)
+    S2S_p=0, S2L_p=1, L2L_p=0, ts=10000, invoke_pfe=false, verbosity=0)
     tot_ele = num_sources + num_loads
     cntr = 0
     num_connections = 0
