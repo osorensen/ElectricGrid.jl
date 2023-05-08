@@ -31,7 +31,7 @@ function Benchmark(num_nodes)
     """
     env = GetEnv(num_nodes)
     agent = SetupAgents(env)
-    b = @benchmark Simulate($agent, $env)
+    b = @benchmark Simulate($agent, $env, episodes = 1)
     return b
 end
 
@@ -53,7 +53,9 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 end
 # N = NodeConstructor(num_sources = 2, num_loads = 2)
 
-CollectBenchmarkData(100)
+max_num_nodes = 20
+
+CollectBenchmarkData(max_num_nodes)
 
 @save "benchmark_data_2_$max_num_nodes.jld2" benchmark_data
 
