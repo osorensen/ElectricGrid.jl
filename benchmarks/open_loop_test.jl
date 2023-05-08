@@ -53,16 +53,14 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 end
 # N = NodeConstructor(num_sources = 2, num_loads = 2)
 
-max_num_nodes = 20
+CollectBenchmarkData(50, 5)
 
-CollectBenchmarkData(max_num_nodes)
+@save "benchmark_data_2_$(max_num_nodes)_wo_ps.jld2" benchmark_data
 
-@save "benchmark_data_2_$max_num_nodes.jld2" benchmark_data
-
-
+# wo_ps: without processor shielding
 
 times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(2:33)
+nodes = collect(2:5:45)
 # plot with confidence interval
 
 StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times], 
@@ -74,7 +72,7 @@ StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times],
 #     label = "Benchmark", legend = :topright,
 #     errorstyle=:plume, linewidth = 2, color = :red, alpha = 0.5,)
 
-savefig("benchmark_2_$max_num_nodes.png")
+savefig("benchmark_2_47_wo_ps.png")
 
 
 
