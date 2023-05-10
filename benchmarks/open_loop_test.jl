@@ -17,11 +17,14 @@ function GetEnv(num_nodes)
     env = ElectricGridEnv(  
                 num_sources = num_nodes, 
                 num_loads = num_nodes, 
-                t_end = 0.5, 
+                t_end = 1.0,  #dt = 0.0001
                 verbosity = 0,
                 )
     return env
 end
+
+# just try with "my_ddpg" for now
+# learning (with)
 
 benchmark_data = []
 
@@ -31,7 +34,8 @@ function Benchmark(num_nodes)
     """
     env = GetEnv(num_nodes)
     agent = SetupAgents(env)
-    b = @benchmark Simulate($agent, $env, episodes = 1)
+
+    b = @benchmark Simulate($agent, $env)
     return b
 end
 
@@ -55,7 +59,7 @@ end
 
 CollectBenchmarkData(50, 5)
 
-@save "benchmark_data_2_$max_num_nodes_wo_ps.jld2" benchmark_data
+@save "benchmark_data_2_$max_num_nodes.jld2" benchmark_data
 
 # wo_ps: without processor shielding
 
@@ -64,9 +68,10 @@ nodes = collect(2:33)
 # plot with confidence interval
 
 StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times], 
-    xlabel = "Number of nodes", ylabel = "Time (s)", label = "Benchmark", 
+    xlabel = "Number of nodes", ylabel = "Averaged over (s)", label = "Benchmark", #y axis label
     title = "Benchmark for Open Loop Simulation", legend = :topright)
 
+    # realtime line 
 
 # errorline(nodes, times', 
 #     label = "Benchmark", legend = :topright,
