@@ -76,11 +76,16 @@ times = [(b.times * 1e-9) for b in benchmark_data]
 nodes = collect(2:delta:max_num_nodes)
 # plot with confidence interval
 
-StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times], 
-    xlabel = "Number of nodes", ylabel = "Averaged over (s)", label = "Benchmark", #y axis label
-    title = "Benchmark for Open Loop Simulation", legend = :topright)
+StatsPlots.plot(nodes, 
+            mean.(times), 
+            yerr = [std(b) for b in times], 
+            xlabel = "Number of nodes", 
+            ylabel = "Averaged over (s)", 
+            label = "Benchmark", #y axis label
+            title = "Benchmark for Open Loop Simulation for 1s (with Δt = 1ms)", 
+            legend = :topright)
 
-    # realtime line 
+# realtime line 
 
 # errorline(nodes, times', 
 #     label = "Benchmark", legend = :topright,
