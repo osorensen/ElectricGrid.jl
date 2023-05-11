@@ -13,20 +13,24 @@ using JLD2
 # end
 
 
-function GetEnv(num_nodes)
+function GetEnv(num_nodes, source_mode = "Swing")
     env = ElectricGridEnv(  
                 num_sources = num_nodes, 
                 num_loads = num_nodes, 
                 t_end = 1.0,  #dt = 0.0001
                 verbosity = 0,
                 )
+
+    # change source mode to Swing
+    for i in 1:num_nodes
+        env.nc.parameters["source"][i]["mode"] = source_mode
+    end
     return env
 end
 
 # just try with "my_ddpg" for now
 # learning (with)
 
-benchmark_data = []
 
 function Benchmark(num_nodes)
     """
@@ -35,7 +39,7 @@ function Benchmark(num_nodes)
     env = GetEnv(num_nodes)
     agent = SetupAgents(env)
 
-    b = @benchmark Simulate($agent, $env)
+    b = @benchmark Simulate($agent, $env) samples=4 seconds=60
     return b
 end
 
@@ -57,14 +61,19 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 end
 # N = NodeConstructor(num_sources = 2, num_loads = 2)
 
+max_num_nodes = 50
+delta = 5
+benchmark_data = []
+
 CollectBenchmarkData(50, 5)
 
-@save "benchmark_data_2_$max_num_nodes.jld2" benchmark_data
+
+@save "benchmark_$(delta)_$max_num_nodes.jld2" benchmark_data
 
 # wo_ps: without processor shielding
 
 times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(2:33)
+nodes = collect(2:delta:max_num_nodes)
 # plot with confidence interval
 
 StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times], 
@@ -77,11 +86,11 @@ StatsPlots.plot(nodes, mean.(times), yerr = [std(b) for b in times],
 #     label = "Benchmark", legend = :topright,
 #     errorstyle=:plume, linewidth = 2, color = :red, alpha = 0.5,)
 
-savefig("benchmark_2_$max_num_nodes_wo_ps.png")
+savefig("benchmark_$(delta)_$max_num_nodes.png")
 
 
 
-# env = GetEnv(2)
+env = GetEnv(2)
 # agent = SetupAgents(env)
 # b = @benchmark Simulate($agent, $env)
 
