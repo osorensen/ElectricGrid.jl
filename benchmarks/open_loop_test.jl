@@ -5,7 +5,7 @@ using Distributions
 using JLD2
 using Random
 
-RNG = MersenneTwister(1234);
+Random.seed!(123);
 
 
 # function GeneratePermutationNodes(num_nodes)

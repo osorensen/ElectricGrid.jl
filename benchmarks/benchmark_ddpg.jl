@@ -3,6 +3,11 @@ using BenchmarkTools
 using Distributions
 using JLD2
 using StatsPlots
+using Random
+
+Random.seed!(123);
+
+
 
 function GetEnv(num_nodes, source_type = "RL")
     """
@@ -12,17 +17,16 @@ function GetEnv(num_nodes, source_type = "RL")
     env = ElectricGridEnv(  
                 num_sources = num_nodes, 
                 num_loads = num_nodes, 
-                t_end = 1.0,  #dt = 0.0001
-                verbosity = 0,
+                # t_end = 1.0,  #dt = 0.0001
+                # verbosity = 0,
                 ) 
-
 
     for i in 1:num_nodes
         if source_type == "classical"
             env.nc.parameters["source"][i]["mode"] = "Swing"
         end
         env.nc.parameters["source"][i]["source_type"] = source_type
-        # env.nc.parameters["source"][i]["mode"] = "ddpg"
+        env.nc.parameters["source"][i]["mode"] = ""
     end
 
     new_env = ElectricGridEnv(
@@ -56,8 +60,10 @@ function Benchmark(num_nodes, source_type = "RL")
     """
     env = GetEnv(num_nodes, source_type)
     controller = GetAgent(env)
+    # empty hook || datalogging on / off
+    hook = DataHook()
+    b = @benchmark Simulate($controller, $env, num_episodes=1, hook=$hook) samples=3 seconds=60
 
-    b = @benchmark Simulate($controller, $env) samples=3 seconds=60
     return b
 end
 
@@ -78,27 +84,34 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 
 end
 
+# test
+# env = GetEnv(27)
+# controller = GetAgent(env)
+# hook = DataHook()
+
+# b_test = @benchmark Simulate($controller, $env, num_episodes=1, hook=$hook) samples=3
+
 # simulation parameter
-max_num_nodes = 50
-delta_num_nodes = 4
+max_num_nodes = 15
+delta = 1
 control_type = "RL"
 
 benchmark_data = []
 
-CollectBenchmarkData(max_num_nodes, delta_num_nodes)
+CollectBenchmarkData(max_num_nodes, delta)
 
-@save "benchmark_$(control_type)_$(delta_num_nodes)_$(max_num_nodes).jld2" benchmark_data
+@save "benchmark_$(control_type)_$(delta)_$max_num_nodes.jld2" benchmark_data
 
 # plot benchmark data
 times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(2:delta:max_num_nodes)
+nodes = collect(2:delta:32)
 
 StatsPlots.plot(
             nodes, 
             mean.(times), 
             yerr = [std(b) for b in times], 
             xlabel = "Number of nodes", 
-            ylabel = "Averaged over 3 differnt runs", 
+            ylabel = "Averaged over 3 differnt runs (s)", 
             label = "Benchmark for RL", #y axis label
             title = "Benchmark for RL control for 1s (with Δt = 1ms)", 
             legend = :topright)
