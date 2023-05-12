@@ -3,6 +3,10 @@ using ElectricGrid
 using BenchmarkTools
 using Distributions
 using JLD2
+using Random
+
+RNG = MersenneTwister(1234);
+
 
 # function GeneratePermutationNodes(num_nodes)
 #     """
@@ -61,11 +65,11 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 end
 # N = NodeConstructor(num_sources = 2, num_loads = 2)
 
-max_num_nodes = 50
-delta = 5
+max_num_nodes = 15
+delta = 1
 benchmark_data = []
 
-CollectBenchmarkData(50, 5)
+CollectBenchmarkData(max_num_nodes, delta)
 
 
 @save "benchmark_$(delta)_$max_num_nodes.jld2" benchmark_data
