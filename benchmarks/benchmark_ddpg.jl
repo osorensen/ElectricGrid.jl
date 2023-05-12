@@ -7,33 +7,29 @@ using Random
 
 Random.seed!(123);
 
-
-
 function GetEnv(num_nodes, source_type = "RL")
     """
     Generates an env of source and load nodes for a grid with a given source type
     """   
 
-    env = ElectricGridEnv(  
+    nc = NodeConstructor(  
                 num_sources = num_nodes, 
                 num_loads = num_nodes, 
-                # t_end = 1.0,  #dt = 0.0001
-                # verbosity = 0,
                 ) 
 
     for i in 1:num_nodes
         if source_type == "classical"
-            env.nc.parameters["source"][i]["mode"] = "Swing"
+            nc.parameters["source"][i]["mode"] = "Swing"
         end
-        env.nc.parameters["source"][i]["source_type"] = source_type
-        env.nc.parameters["source"][i]["mode"] = ""
+        nc.parameters["source"][i]["control_type"] = source_type
+        nc.parameters["source"][i]["mode"] = "ddpg"
     end
 
     new_env = ElectricGridEnv(
-        CM=env.nc.CM,
+        CM=nc.CM,
         action_delay=0,
         t_end = 1.0, 
-        parameters = env.nc.parameters,
+        parameters = nc.parameters,
         )
 
     return new_env
@@ -43,8 +39,8 @@ function GetAgent(RLenv)
     """
     Generates an agent for a given env
     """
-    agent = CreateAgentDdpg(na = length(RLenv.action_ids),
-                ns = length(RLenv.state_ids),
+    agent = CreateAgentDdpg(na = length(RLenv.agent_dict["ddpg"]["action_ids"]),
+                ns = length(state(RLenv, "ddpg")),
                 use_gpu = false);
 
     custom_agents = Dict("ddpg" => agent)
@@ -84,12 +80,6 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
 
 end
 
-# test
-# env = GetEnv(27)
-# controller = GetAgent(env)
-# hook = DataHook()
-
-# b_test = @benchmark Simulate($controller, $env, num_episodes=1, hook=$hook) samples=3
 
 # simulation parameter
 max_num_nodes = 15
@@ -104,7 +94,7 @@ CollectBenchmarkData(max_num_nodes, delta)
 
 # plot benchmark data
 times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(2:delta:32)
+nodes = collect(2:delta:max_num_nodes)
 
 StatsPlots.plot(
             nodes, 
@@ -116,6 +106,8 @@ StatsPlots.plot(
             title = "Benchmark for RL control for 1s (with Δt = 1ms)", 
             legend = :topright)
 
+StatsPlots.plot!(nodes, 
+    [1 for _ in 1:length(nodes)])
 
 
 
