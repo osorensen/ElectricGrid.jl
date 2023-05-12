@@ -1,6 +1,12 @@
 
 Manifest.toml
 
+# file formats
+*.pdf
+*.jld2
+*.svg
+*.png
+
 # App
 dev/*
 build/*
