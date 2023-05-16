@@ -71,10 +71,10 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
     @info "Dummy run..."
     Benchmark(2)
 
-    for i in 2:delta_num_nodes:max_num_nodes
+    for i in 1:delta_num_nodes:max_num_nodes
 
         @info "Running benchmark for $i nodes..."
-        b = Benchmark(i)
+        b = Benchmark(i, "RL")
         push!(benchmark_data, b)
     end        
 
@@ -94,7 +94,7 @@ CollectBenchmarkData(max_num_nodes, delta)
 
 # plot benchmark data
 times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(2:delta:max_num_nodes)
+nodes = collect(1:delta:max_num_nodes)
 
 StatsPlots.plot(
             nodes, 
@@ -108,8 +108,3 @@ StatsPlots.plot(
 
 StatsPlots.plot!(nodes, 
     [1 for _ in 1:length(nodes)])
-
-
-
-
-             

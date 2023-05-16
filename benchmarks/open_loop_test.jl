@@ -55,7 +55,7 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
     @info "Dummy run..."
     Benchmark(2)
 
-    for i in 2:delta_num_nodes:max_num_nodes
+    for i in 1:delta_num_nodes:max_num_nodes
 
         @info "Running benchmark for $i nodes..."
         b = Benchmark(i)
