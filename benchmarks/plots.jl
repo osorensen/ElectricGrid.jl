@@ -43,14 +43,14 @@ StatsPlots.plot!(
 
 savefig("benchmark_lea_1_15.png")
 # try with plotlyS
-using PlotlyJS
+# using PlotlyJS
 
-# plot classical data and ddpg data
-traces = []
-push!(traces, PlotlyJS.scatter(x=nodes, y=mean.(times_classical), mode="lines", name="classical"))
-push!(traces, PlotlyJS.scatter(x=nodes[1:7], y=mean.(times_ddpg), mode="lines", name="ddpg"))
-push!(traces, PlotlyJS.scatter(x=nodes, y=real_time, mode="lines", name="realtime"))
+# # plot classical data and ddpg data
+# traces = []
+# push!(traces, PlotlyJS.scatter(x=nodes, y=mean.(times_classical), mode="lines", name="classical"))
+# push!(traces, PlotlyJS.scatter(x=nodes[1:7], y=mean.(times_ddpg), mode="lines", name="ddpg"))
+# push!(traces, PlotlyJS.scatter(x=nodes, y=real_time, mode="lines", name="realtime"))
 
-# plot
-PlotlyBase.Plot(traces,
-    config=PlotConfig(scrollZoom=true))
+# # plot
+# PlotlyBase.Plot(traces,
+#     config=PlotConfig(scrollZoom=true))
