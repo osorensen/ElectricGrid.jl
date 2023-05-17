@@ -6,11 +6,14 @@ nc = NodeConstructor(
     num_loads = 2,
 )
 
+@show nc.parameters["source"][1]["control_type"]
+
 # replace control type to RL and mode to ddpg
 for i in 1:nc.num_sources
-    nc.parameters["source"][i]["source_type"] = "RL"
+    nc.parameters["source"][i]["control_type"] = "RL"
     nc.parameters["source"][i]["mode"] = "ddpg"
 end
+
 
 temp_env = ElectricGridEnv(
     CM=nc.CM,
@@ -21,3 +24,6 @@ temp_env = ElectricGridEnv(
 
 @show temp_env.nc.parameters["source"][1]["mode"]
 @show temp_env.agent_dict
+
+
+@benchmark Simulate($controller, $env) 
