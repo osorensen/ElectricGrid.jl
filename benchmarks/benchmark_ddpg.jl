@@ -82,7 +82,7 @@ end
 
 
 # simulation parameter
-max_num_nodes = 15
+max_num_nodes = 5
 delta = 1
 control_type = "RL"
 
