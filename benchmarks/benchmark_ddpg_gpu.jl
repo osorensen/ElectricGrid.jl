@@ -30,7 +30,7 @@ function GetEnv(num_nodes, source_type = "RL")
         action_delay=0,
         t_end = 1.0, 
         parameters = nc.parameters,
-        use_gpu = true,
+        use_gpu = false,
         )
 
     return new_env
@@ -83,7 +83,7 @@ end
 
 
 # simulation parameter
-max_num_nodes = 15
+max_num_nodes = 25
 delta = 1
 control_type = "RL"
 
@@ -91,7 +91,7 @@ benchmark_data = []
 
 CollectBenchmarkData(max_num_nodes, delta)
 
-@save "benchmark_$(control_type)_$(delta)_$max_num_nodes.jld2" benchmark_data
+@save "benchmark_gpu_$(control_type)_$(delta)_$max_num_nodes.jld2" benchmark_data
 
 # plot benchmark data
 times = [(b.times * 1e-9) for b in benchmark_data]
