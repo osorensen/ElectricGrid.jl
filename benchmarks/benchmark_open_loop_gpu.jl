@@ -4,96 +4,93 @@ using BenchmarkTools
 using Distributions
 using JLD2
 using Random
-
+using CUDA
+# using ReinforcementLearning
 Random.seed!(123);
-
-
-# function GeneratePermutationNodes(num_nodes)
-#     """
-#     Generates a permutation of source and load nodes for the grid
-#     """
-#     nodes = collect(1:num_nodes)
-#     return permutedims(collect(permutations(nodes)))
-# end
-
 
 function GetEnv(num_nodes)
 
     env = ElectricGridEnv(
         num_sources = num_nodes,
         num_loads = num_nodes,
-        CM=nc.CM,
-        action_delay=0,
         t_end = 1.0, 
-        use_gpu = true,
-        )
-    return env
+        verbosity = 0, 
+        use_gpu=true)
 end
 
-# just try with "my_ddpg" for now
-# learning (with)
+function Run(env, training = false)
+    CUDA.@sync begin
 
+        # hook(PRE_EXPERIMENT_STAGE, policy, env, training)
+        # policy(PRE_EXPERIMENT_STAGE, env, training)
+
+        is_stop = false
+        while !is_stop
+            reset!(env)
+
+            # ResetPolicy(policy)
+
+            # policy(PRE_EPISODE_STAGE, env, training)
+            # hook(PRE_EPISODE_STAGE, policy, env, training)
+
+            while !is_terminated(env) # one episode
+                action = 0.002 * rand.(env.action_space)
+                    
+                # policy(PRE_ACT_STAGE, env, action, training)
+                # hook(PRE_ACT_STAGE, policy, env, action, training)
+                
+                action = CuArray(action)
+                env(action)
+
+                # policy(POST_ACT_STAGE, env, training)
+                # hook(POST_ACT_STAGE, policy, env, training)
+
+                if env.done
+                    is_stop = true
+                    break
+                end
+            end # end of an episode
+
+            # if is_terminated(env)
+            #     # policy(POST_EPISODE_STAGE, env, training)  # let the policy see the last observation
+            #     # hook(POST_EPISODE_STAGE, policy, env, training)
+            # end
+        end
+    end
+end
+
+benchmark_data = []
+max_num_nodes = 25
 
 function Benchmark(num_nodes)
     """
     Runs benchmark for the env for a given number of nodes
     """
-    env = GetEnv(num_nodes)
-    agent = SetupAgents(env)
-
-    b = @benchmark Simulate($agent, $env) samples=4 seconds=60
-    return b
-end
-
-function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
-    """
-    Collects benchmark data for a given number of nodes
-    """
-    # dummy run
-    @info "Dummy run..."
-    Benchmark(2)
-
-    for i in 1:delta_num_nodes:max_num_nodes
-
+    for i in 1:num_nodes
         @info "Running benchmark for $i nodes..."
-        b = Benchmark(i)
+        env = GetEnv(i)
+        b = @benchmark Run($env) samples=3 seconds = 60
         push!(benchmark_data, b)
-    end        
-
+        
+    end 
+    return benchmark_data
 end
-# N = NodeConstructor(num_sources = 2, num_loads = 2)
 
-max_num_nodes = 15
-delta = 1
-benchmark_data = []
+Benchmark(max_num_nodes)
 
-CollectBenchmarkData(max_num_nodes, delta)
+@save "benchmark_open_loop_gpu.jld2" benchmark_data
 
+times = [mean(b.times*1e-9) for b in benchmark_data]
+nodes = collect(2:max_num_nodes)
+# Plotting
+using StatsPlots
+StatsPlots.plot(
+    # nodes, 
+    times,
+    xlabel = "Number of nodes",
 
-@save "benchmark_lea_$(delta)_$max_num_nodes.jld2" benchmark_data
+)
 
-# wo_ps: without processor shielding
-
-times = [(b.times * 1e-9) for b in benchmark_data]
-nodes = collect(1:delta:max_num_nodes)
-# plot with confidence interval
-
-StatsPlots.plot(nodes, 
-            mean.(times), 
-            yerr = [std(b) for b in times], 
-            xlabel = "Number of nodes", 
-            ylabel = "Averaged over (s)", 
-            label = "Benchmark", #y axis label
-            title = "Benchmark for Open Loop Simulation for 1s (with Δt = 1ms)", 
-            legend = :topright)
-
-# realtime line 
-
-# errorline(nodes, times', 
-#     label = "Benchmark", legend = :topright,
-#     errorstyle=:plume, linewidth = 2, color = :red, alpha = 0.5,)
-
-savefig("benchmark_$(delta)_$max_num_nodes.png")
 
 
 
