@@ -529,11 +529,11 @@ function (env::ElectricGridEnv)(action)
 
     env.state = env.inner_featurize(; env=env)
     env.reward = env.reward_function(env)
-    env.done = (env.steps >= env.maxsteps) || (any(abs.(env.x ./ env.norm_array) .> 1))
+    env.done = (env.steps >= env.maxsteps) || (any(abs.(Array(env.x) ./ env.norm_array) .> 1))
 
     if env.done
-        if any(abs.(env.x ./ env.norm_array) .> 1)
-            states_exceeded = findall(abs.(env.x ./ env.norm_array) .> 1)
+        if any(abs.(Array(env.x) ./ env.norm_array) .> 1)
+            states_exceeded = findall(abs.(Array(env.x) ./ env.norm_array) .> 1)
             if env.verbosity > 0
                 @warn ("The state(s) $(env.state_ids[states_exceeded]) exceeded limit(s)
                     -> episode abort")
