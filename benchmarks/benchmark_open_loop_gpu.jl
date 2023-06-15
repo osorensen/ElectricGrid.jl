@@ -17,21 +17,14 @@ Random.seed!(123);
 # end
 
 
-function GetEnv(num_nodes, source_mode = "Swing")
-    nc = NodeConstructor(  
-                num_sources = num_nodes, 
-                num_loads = num_nodes, 
-                ) 
+function GetEnv(num_nodes)
 
-    # change source mode to Swing
-    for i in 1:num_nodes
-        nc.parameters["source"][i]["mode"] = source_mode
-    end
     env = ElectricGridEnv(
+        num_sources = num_nodes,
+        num_loads = num_nodes,
         CM=nc.CM,
         action_delay=0,
         t_end = 1.0, 
-        parameters = nc.parameters,
         use_gpu = true,
         )
     return env
@@ -104,13 +97,3 @@ savefig("benchmark_$(delta)_$max_num_nodes.png")
 
 
 
-env = GetEnv(2)
-# agent = SetupAgents(env)
-# b = @benchmark Simulate($agent, $env)
-
-i = Benchmark(1)
-
-# b = @benchmarkable lu(rand(10,10), samples = 100)
-# t = run(b)
-
-# StatsPlots.plot(t)

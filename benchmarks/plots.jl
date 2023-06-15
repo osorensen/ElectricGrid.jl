@@ -13,7 +13,8 @@ classical_swing_data = load(data_dir * "benchmark_lea_1_15.jld2")["benchmark_dat
 ddpg_data = load(data_dir * "benchmark_lea_RL_1_15.jld2")["benchmark_data"]
 classical_VSG_data = load(data_dir * "benchmark_csvm_Synchronverter_1_15.jld2")["benchmark_data"]
 
-
+# ddpg_gpu_data = load(data_dir * "benchmark_gpu_RL_1_25.jld2")["benchmark_data"]
+ddpg_gpu_data = load(data_dir * "benchmark_lea_gpu_ddpg_env_1_25.jld2")["benchmark_data"]
 
 # plot classical data and ddpg data
 nodes = collect(1:1:15)
@@ -21,10 +22,10 @@ nodes = collect(1:1:15)
 times_vsg = [(b.times * 1e-9) for b in classical_VSG_data]
 times_ddpg = [(b.times * 1e-9) for b in ddpg_data]
 time_swing = [(b.times * 1e-9) for b in classical_swing_data]
-
+times_gpu = [(b.times * 1e-9) for b in ddpg_gpu_data]
 # constant time for real time at 1s
-real_time = [1 for _ in classical_data]
-
+real_time = [1 for _ in nodes]
+times_ddpg_gpu = [(b.times * 1e-9) for b in ddpg_gpu_data]  
 
 StatsPlots.plot(
     nodes,
@@ -56,16 +57,25 @@ StatsPlots.plot!(
 # plot realtime
 
 
-
-StatsPlots.plot!(
-    nodes,
+StatsPlots.plot(
+    # nodes,
     mean.(times_ddpg),
-    ribbon = [std(b) for b in time_swing],
-    label="ddpg",
+    ribbon = [std(b) for b in times_ddpg],
+    label="ddpg cpu",
     color=:green,
     fillalpha=0.3,
     )
     
+times_gpu_ = times_ddpg_gpu[1:15]
+
+StatsPlots.plot!(
+    nodes,
+    mean.(times_gpu_),
+    ribbon = [std(b) for b in times_gpu_],
+    label="ddpg gpu",
+    color=:blue,
+    fillalpha=0.3,
+    )
 
 
 

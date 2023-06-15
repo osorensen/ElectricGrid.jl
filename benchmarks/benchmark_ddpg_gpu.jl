@@ -30,7 +30,7 @@ function GetEnv(num_nodes, source_type = "RL")
         action_delay=0,
         t_end = 1.0, 
         parameters = nc.parameters,
-        use_gpu = false,
+        use_gpu = true,
         )
 
     return new_env
@@ -72,7 +72,7 @@ function CollectBenchmarkData(max_num_nodes, delta_num_nodes = 1)
     @info "Dummy run..."
     Benchmark(2)
 
-    for i in 2:delta_num_nodes:max_num_nodes
+    for i in 1:delta_num_nodes:max_num_nodes
 
         @info "Running benchmark for $i nodes..."
         b = Benchmark(i)
@@ -109,8 +109,3 @@ StatsPlots.plot(
 
 StatsPlots.plot!(nodes, 
     [1 for _ in 1:length(nodes)])
-
-
-
-
-             
