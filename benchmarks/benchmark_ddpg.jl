@@ -82,7 +82,7 @@ end
 
 
 # simulation parameter
-max_num_nodes = 5
+max_num_nodes = 25
 delta = 1
 control_type = "RL"
 
@@ -90,7 +90,7 @@ benchmark_data = []
 
 CollectBenchmarkData(max_num_nodes, delta)
 
-@save "benchmark_$(control_type)_$(delta)_$max_num_nodes.jld2" benchmark_data
+@save "benchmark_lea_cpu_new_$(control_type)_$(delta)_$max_num_nodes.jld2" benchmark_data
 
 # plot benchmark data
 times = [(b.times * 1e-9) for b in benchmark_data]
