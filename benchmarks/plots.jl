@@ -10,7 +10,7 @@ plotsdir = pwd() * "/benchmarks/plots/"
 
 # benchmark data
 # classical_swing_data = load(data_dir * "benchmark_lea_1_15.jld2")["benchmark_data"]
-ddpg_data = load(data_dir * "benchmark_lea_RL_1_15.jld2")["benchmark_data"]
+# ddpg_data = load(data_dir * "benchmark_lea_RL_1_15.jld2")["benchmark_data"]
 # classical_VSG_data = load(data_dir * "benchmark_csvm_Synchronverter_1_15.jld2")["benchmark_data"]
 
 open_loop_cpu = load(data_dir * "benchmark_lea_open_loop_cpu.jld2")["benchmark_data"]
@@ -19,15 +19,18 @@ open_loop_gpu = load(data_dir * "benchmark_lea_open_loop_gpu.jld2")["benchmark_d
 # ddpg_gpu_data = load(data_dir * "benchmark_gpu_RL_1_25.jld2")["benchmark_data"]
 ddpg_gpu_data = load(data_dir * "benchmark_lea_gpu_ddpg_env_1_25.jld2")["benchmark_data"]
 
+ddpg_cpu_25 = load(data_dir * "benchmark_lea_RL_1_25.jld2")["benchmark_data"]
+
 # plot classical data and ddpg data
-nodes = collect(1:1:15)
+nodes = collect(1:1:25)
 
 # times_vsg = [(b.times * 1e-9) for b in classical_VSG_data]
 
 times_open_loop_cpu = [(b.times * 1e-9) for b in open_loop_cpu]
 times_open_loop_gpu = [(b.times * 1e-9) for b in open_loop_gpu]
+# times_open_loop_cpu_25 = [(b.times * 1e-9) for b in open_loop_cpu_25]
 
-nodes = collect(1:1:25)
+# nodes = collect(1:1:25)
 
 
 StatsPlots.plot!(
@@ -41,8 +44,8 @@ StatsPlots.plot!(
 
 StatsPlots.plot!(
     nodes,
-    mean.(times_open_loop_gpu[2:26]),
-    # ribbon = [std(b) for b in times_open_loop_gpu[1:25]],
+    mean.(times_open_loop_gpu[1:25]),
+    ribbon = [std(b) for b in times_open_loop_gpu[1:25]],
     label="open loop gpu",
     color=:red,
     fillalpha=0.3,
@@ -52,18 +55,20 @@ StatsPlots.plot!(
 
 times_ddpg_cpu = [(b.times * 1e-9) for b in ddpg_data]
 times_ddpg_gpu = [(b.times * 1e-9) for b in ddpg_gpu_data]
+times_ddpg_cpu_25 = [(b.times * 1e-9) for b in ddpg_cpu_25]
 nodes_ddpg = collect(1:15)
 
 StatsPlots.plot!(
-    nodes_ddpg,
-    mean.(times_ddpg_cpu),
-    ribbon = [std(b) for b in times_ddpg_cpu],
+    nodes,
+    mean.(times_ddpg_cpu_25),
+    # ribbon = [std(b) for b in times_ddpg_cpu_25],
+    yerr = [std(b) for b in times_ddpg_cpu_25],
     label="ddpg cpu",
     color=:blue,
     fillalpha=0.3,
     )
 
-StatsPlots.plot(
+StatsPlots.plot!(
     nodes[1:24],
     mean.(times_ddpg_gpu),
     yerr = [std(b) for b in times_ddpg_gpu],

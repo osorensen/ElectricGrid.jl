@@ -15,11 +15,12 @@ function GetEnv(num_nodes)
         num_loads = num_nodes,
         t_end = 1.0, 
         verbosity = 0, 
-        use_gpu=true)
+        # use_gpu=true
+        )
 end
 
 function Run(env, training = false)
-    CUDA.@sync begin
+    # CUDA.@sync begin
 
         # hook(PRE_EXPERIMENT_STAGE, policy, env, training)
         # policy(PRE_EXPERIMENT_STAGE, env, training)
@@ -56,7 +57,7 @@ function Run(env, training = false)
             #     # hook(POST_EPISODE_STAGE, policy, env, training)
             # end
         end
-    end
+    # end
 end
 
 benchmark_data = []
@@ -78,7 +79,7 @@ end
 
 Benchmark(max_num_nodes)
 
-@save "benchmark_open_loop_gpu.jld2" benchmark_data
+@save "benchmark_open_loop_cpu.jld2" benchmark_data
 
 times = [mean(b.times*1e-9) for b in benchmark_data]
 nodes = collect(2:max_num_nodes)
