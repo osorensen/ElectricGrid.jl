@@ -39,7 +39,7 @@ StatsPlots.plot!(
     fillalpha=0.3,
     )
 
-StatsPlots.plot(
+StatsPlots.plot!(
     nodes,
     mean.(times_open_loop_gpu[2:26]),
     # ribbon = [std(b) for b in times_open_loop_gpu[1:25]],
@@ -63,13 +63,14 @@ StatsPlots.plot!(
     fillalpha=0.3,
     )
 
-StatsPlots.plot!(
-    nodes,
+StatsPlots.plot(
+    nodes[1:24],
     mean.(times_ddpg_gpu),
-    ribbon = [std(b) for b in times_ddpg_gpu],
+    yerr = [std(b) for b in times_ddpg_gpu],
+    # ribbon = [std(b) for b in times_ddpg_gpu],
     label="ddpg gpu",
     color=:orange,
-    fillalpha=0.3,
+    # fillalpha=0.2,
     )
 
 time_swing = [(b.times * 1e-9) for b in classical_swing_data]
