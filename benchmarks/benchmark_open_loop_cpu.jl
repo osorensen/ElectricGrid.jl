@@ -15,18 +15,19 @@ function GetEnv(num_nodes)
         num_loads = num_nodes,
         t_end = 1.0, 
         verbosity = 0, 
-        use_gpu=true)
+        # use_gpu=true
+        )
 end
 
 function Run(env, training = false)
-    CUDA.@sync begin
+
 
         is_stop = false
         while !is_stop
             reset!(env)
 
             while !is_terminated(env) 
-                action = 0.002 * rand.(env.action_space) 
+                action = 0.002 * rand.(env.action_space)
                 
                 action = CuArray(action)
                 env(action)
@@ -38,7 +39,7 @@ function Run(env, training = false)
             end 
 
         end
-    end
+    # end
 end
 
 benchmark_data = []
@@ -60,7 +61,18 @@ end
 
 Benchmark(max_num_nodes)
 
-@save "benchmark_open_loop_gpu.jld2" benchmark_data
+@save "benchmark_open_loop_cpu.jld2" benchmark_data
+
+times = [mean(b.times*1e-9) for b in benchmark_data]
+nodes = collect(2:max_num_nodes)
+# Plotting
+using StatsPlots
+StatsPlots.plot(
+    # nodes, 
+    times,
+    xlabel = "Number of nodes",
+
+)
 
 
 
