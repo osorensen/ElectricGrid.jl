@@ -71,7 +71,6 @@ benchmark_data = []
 
 CollectBenchmarkData(max_num_nodes, delta)
 
-
 @save "benchmark_lea_$(delta)_$max_num_nodes.jld2" benchmark_data
 
 # wo_ps: without processor shielding
@@ -97,15 +96,7 @@ StatsPlots.plot(nodes,
 
 savefig("benchmark_$(delta)_$max_num_nodes.png")
 
-
-
 env = GetEnv(2)
-# agent = SetupAgents(env)
-# b = @benchmark Simulate($agent, $env)
+
 
 i = Benchmark(1)
-
-# b = @benchmarkable lu(rand(10,10), samples = 100)
-# t = run(b)
-
-# StatsPlots.plot(t)
